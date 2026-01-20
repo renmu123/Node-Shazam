@@ -1,3 +1,7 @@
+# 2.0.2
+
+- move ts to devdeps
+
 # 2.0.1
 
 - bug fix
