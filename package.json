@@ -22,7 +22,8 @@
     "url": "git+https://github.com/renmu123/Node-Shazam.git"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "release": "yarn build && npm publish"
   },
   "keywords": [
     "typescript",
