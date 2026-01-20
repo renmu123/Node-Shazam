@@ -2,7 +2,7 @@ import { SignatureGenerator } from "./algorithm.js";
 import { DecodedMessage } from "./signatures.js";
 import { recognizeBytes } from "shazamio-core";
 import { ShazamRoot } from "./types/shazam.js";
-import fs from "fs";
+import { readFileSync } from "fs";
 import { Request, ShazamURLS } from "./requests.js";
 const TIME_ZONE = "Europe/Paris";
 
@@ -21,8 +21,8 @@ export class Endpoint {
   static HOSTNAME = "amp.shazam.com";
 
   constructor(public timezone: string) {}
-  url(language: string = "en") {
-    return `${Endpoint.SCHEME}://${Endpoint.HOSTNAME}/discovery/v5/${language}/${language.toUpperCase()}/iphone/-/tag/${uuidv4()}/${uuidv4()}`;
+  url() {
+    return `${Endpoint.SCHEME}://${Endpoint.HOSTNAME}/discovery/v5/en/US/iphone/-/tag/${uuidv4()}/${uuidv4()}`;
   }
   params() {
     return {
@@ -72,7 +72,7 @@ export class Endpoint {
       context: {},
       geolocation: {},
     };
-    const url = new URL(this.url(language));
+    const url = new URL(this.url());
     Object.entries(this.params()).forEach(([a, b]) =>
       url.searchParams.append(a, b),
     );
@@ -172,17 +172,12 @@ export class Shazam {
    * @param {string} language Song language (default: 'en')
    * @returns {ShazamRoot | null}
    */
-  async recognise(pathOrBuffer: string | Buffer, language: string = "en") {
-    let fileContent: Buffer;
-    if (typeof pathOrBuffer === "string") {
-      // If pathOrBuffer is a string, assume it's a file path
-      fileContent = fs.readFileSync(pathOrBuffer);
-    } else {
-      // Use the provided buffer
-      fileContent = pathOrBuffer;
-    }
-
-    const signatures = recognizeBytes(fileContent, 0, Number.MAX_SAFE_INTEGER);
+  async recognise(path: string, language: string = "en-US", minimal = false) {
+    const signatures = recognizeBytes(
+      readFileSync(path),
+      0,
+      Number.MAX_SAFE_INTEGER,
+    );
     let response;
 
     for (
@@ -200,7 +195,7 @@ export class Shazam {
         context: {},
         geolocation: {},
       };
-      const url = new URL(this.endpoint.url(language));
+      const url = new URL(this.endpoint.url());
       Object.entries(this.endpoint.params()).forEach(([a, b]) =>
         url.searchParams.append(a, b),
       );

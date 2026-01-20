@@ -1,6 +1,6 @@
 {
   "name": "@renmu/node-shazam",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Node API for Shazam",
   "main": "dist/cjs/api.cjs",
   "module": "dist/esm/index.js",
