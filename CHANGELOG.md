@@ -1,3 +1,7 @@
+# 2.0.3
+
+- remove cjs export
+
 # 2.0.2
 
 - move ts to devdeps
