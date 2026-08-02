@@ -178,43 +178,45 @@ export class Shazam {
       0,
       Number.MAX_SAFE_INTEGER,
     );
-    let response;
+    try {
+      let response;
 
-    for (
-      let i = Math.floor(signatures.length / 2);
-      i < signatures.length;
-      i += 4
-    ) {
-      const data = {
-        timezone: this.endpoint.timezone,
-        signature: {
-          uri: signatures[i].uri,
-          samplems: signatures[i].samplems,
-        },
-        timestamp: new Date().getTime(),
-        context: {},
-        geolocation: {},
-      };
-      const url = new URL(this.endpoint.url());
-      Object.entries(this.endpoint.params()).forEach(([a, b]) =>
-        url.searchParams.append(a, b),
-      );
+      for (
+        let i = Math.floor(signatures.length / 2);
+        i < signatures.length;
+        i += 4
+      ) {
+        const data = {
+          timezone: this.endpoint.timezone,
+          signature: {
+            uri: signatures[i].uri,
+            samplems: signatures[i].samplems,
+          },
+          timestamp: new Date().getTime(),
+          context: {},
+          geolocation: {},
+        };
+        const url = new URL(this.endpoint.url());
+        Object.entries(this.endpoint.params()).forEach(([a, b]) =>
+          url.searchParams.append(a, b),
+        );
 
-      response = await this.endpoint.sendRecognizeRequest(
-        url.toString(),
-        JSON.stringify(data),
-        language,
-      );
-      if (response?.matches.length === 0) continue;
-      break;
+        response = await this.endpoint.sendRecognizeRequest(
+          url.toString(),
+          JSON.stringify(data),
+          language,
+        );
+        if (response?.matches?.length === 0) continue;
+        break;
+      }
+
+      if (!response) return null;
+      if (response?.matches?.length === 0) return null;
+
+      return response;
+    } finally {
+      for (const sig of signatures) sig.free();
     }
-
-    for (const sig of signatures) sig.free();
-
-    if (!response) return null;
-    if (response?.matches.length === 0) return null;
-
-    return response;
   }
 
   createSignatureGenerator(samples: number[]) {

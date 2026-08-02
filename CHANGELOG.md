@@ -1,3 +1,7 @@
+# 2.0.4
+
+- fix memory leak
+
 # 2.0.3
 
 - remove cjs export
